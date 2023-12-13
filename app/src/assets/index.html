@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Exanubes</title>
+  </head>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0f172a;
+      color: #ecfeff;
+    }
+
+    section {
+      width: 100%;
+      margin: auto;
+      max-width: 800px;
+    }
+
+    section > div {
+      display: flex;
+      justify-content: flex-end;
+      margin: 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+    }
+    button {
+      background: rgb(79, 70, 229);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: white;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+      margin-left: auto;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: rgb(99, 102, 241);
+    }
+
+    .user {
+      display: flex;
+      gap: 16px;
+      padding: 8px 0;
+      margin: 0 16px;
+      border-bottom: #ecfeff 1px solid;
+      font-size: 1.5rem;
+    }
+  </style>
+  <body>
+    <section>
+      <h1>Exanubes</h1>
+      <div>
+        <button>Add user</button>
+      </div>
+      <ul id="root"></ul>
+    </section>
+  </body>
+  <script>
+    const button = document.querySelector("button");
+    const root = document.querySelector("#root");
+
+    button.addEventListener("click", async () => {
+      await fetch("/users", {
+        method: "POST",
+      });
+      await renderUsers();
+    });
+
+    function createUserComponent({ fullName, phone, type }) {
+      return `
+      <li class="user">
+        <span><strong>${fullName}</strong></span>
+        <span>${phone}</span>
+        <span>${type}</span>
+      </li>
+    `;
+    }
+
+    async function getUsers() {
+      const res = await fetch("/users");
+      const data = await res.json();
+      return data.users;
+    }
+
+    async function renderUsers() {
+      const users = await getUsers();
+      const html = users.map(createUserComponent);
+      root.innerHTML = html.join("");
+    }
+
+    void renderUsers();
+  </script>
+</html>
