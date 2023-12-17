@@ -28,4 +28,6 @@ function createNewUser() {
 
 module.exports = {
   createNewUser,
+  Users,
+  UserType,
 };
