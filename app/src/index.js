@@ -2,8 +2,8 @@ const fs = require("fs");
 const http = require("http");
 const { join } = require("path");
 
-const { createNewUser } = require("./users");
-
+const { createNewUser, Users } = require("./users");
+const { database } = require("./database");
 const host = "localhost";
 const port = 1234;
 
@@ -12,17 +12,21 @@ const port = 1234;
  * @param {typeof import("http").ServerResponse} response
  * @returns {void}
  * */
-function router(request, response) {
+async function router(request, response) {
   switch (request.url) {
     case "/users":
       switch (request.method) {
         case "POST":
-          // TODO: Create user
+          const newUser = createNewUser();
+          const [user] = await database
+            .insert(Users)
+            .values(newUser)
+            .returning();
           response.writeHead(201);
-          response.end("Create User");
+          response.end(user.id);
           break;
         case "GET":
-          const users = Array.from({ length: 3 }, createNewUser);
+          const users = await database.select().from(Users);
 
           response.setHeader("Content-Type", "application/json");
           response.writeHead(200);
